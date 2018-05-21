@@ -5,7 +5,19 @@
       &nbsp;
     </div>
     <div class="col-6">
-      <!-- Login form goes here -->
+      <form method="POST" action="/login" enctype="application/x-www-form-urlencoded">
+        <div class="form-group">
+            <label for="login">Login</label>
+            <input type="text" class="form-control" id="login" name="login" placeholder="Enter login">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <hr />
+        <a href="/signup">Do not have an account?</a>
+    </form>
     </div>
     <div class="col">
       &nbsp;
