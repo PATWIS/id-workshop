@@ -19,6 +19,11 @@ const apiRouter = require('./api/todo');
 
 const app = express();
 
+const db = require('./data');
+const LocalStrategy = require('passport-local').Strategy;
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -28,6 +33,38 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+// passport 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, cb) => {
+  cb(null, user.username);
+});
+
+passport.deserializeUser((username, cb) => {
+  db.user(username, (err, user) => cb(err, user));
+});
+
+
+
+passport.use(new LocalStrategy({
+    usernameField: 'login',
+    passwordField: 'password'
+  },
+  (username, password, cb) => {
+    db.user(username, (err, user) => {
+      if (err) {
+        return cb(err);
+      }
+      if (!user) {
+        return cb(null, false);
+      }
+      // ...
+    });
+  }
+));
 
 // add anonymous user
 app.use(anonymousAuth);
@@ -67,5 +104,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
+
 
 module.exports = app;
