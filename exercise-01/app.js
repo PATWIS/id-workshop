@@ -55,4 +55,17 @@ app.use((err, req, res) => {
   res.render('error');
 });
 
+app.use(session({
+  secret: 's3cr3t',
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    // We really should be setting this!
+    // secure: true,
+  },
+  name: 'id-workshop-session-cookie',
+  resave: false,
+  saveUninitialized: false
+}));
+
 module.exports = app;
