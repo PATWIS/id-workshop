@@ -61,7 +61,9 @@ passport.use(new LocalStrategy({
       if (!user) {
         return cb(null, false);
       }
-      // ...
+      bcrypt.compare(password, user.hash, (err, match) => {
+        cb(err, match ? user : false);
+      });
     });
   }
 ));
@@ -104,6 +106,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/login');
+});
 
 
 module.exports = app;
