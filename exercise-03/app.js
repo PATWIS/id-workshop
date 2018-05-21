@@ -20,6 +20,35 @@ const apiRouter = require('./api/todo');
 
 const app = express();
 
+const Auth0Strategy = require('passport-auth0');
+
+passport.use(new Auth0Strategy({
+    domain: 'infoshare2018.eu.auth0.com',
+    clientID: 'IVDQEgKgSUPGbtZ2QKZCDFmTLHwXe61n',
+    clientSecret: 'xbXe99caMEcXcdrFRmTcnKqICOpNdNIh2S11nU75UpHUBRpOQS5Hr7JHIKqUo0ES',
+    callbackURL: 'http://localhost:3000/login/callback'
+  },
+  (accessToken, refreshToken, params, profile, cb) => {
+    profile.access_token = accessToken;
+    db.store(profile, (err) => cb(err, profile));
+  }
+));
+
+const BearerStrategy = require('passport-http-bearer').Strategy;
+
+passport.use(new BearerStrategy(
+  (token, cb) => {
+    fs.readFile(path.join(__dirname, 'auth0.pem'), (err, cert) => {
+      jwt.verify(token, cert, (err, payload) => {
+        if (err) {
+          return cb(err);
+        }
+        cb(null, payload);
+      });
+    });
+  }
+));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -56,18 +85,7 @@ passport.deserializeUser((user_id, cb) => {
   db.user(user_id, (err, user) => cb(err, user));
 });
 
-const Auth0Strategy = require('passport-auth0');
 
-passport.use(new Auth0Strategy({
-    domain: 'infoshare2018.eu.auth0.com',
-    clientID: process.env.AUTH0_CLIENTID,
-    clientSecret: process.env.AUTH0_CLIENTSECRET,
-    callbackURL: 'http://localhost:3000/login/callback'
-  },
-  (accessToken, refreshToken, params, profile, cb) => {
-    db.store(profile, (err) => cb(err, profile));
-  }
-));
 
 // add anonymous user
 app.use(anonymousAuth);

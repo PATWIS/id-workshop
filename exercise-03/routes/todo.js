@@ -25,7 +25,7 @@ router.post('/', (req, res, next) => {
 
 router.post('/done', (req, res, next) => {
   const submitted = _.keys(req.body);
-  
+
   if (!submitted) {
     return next(new Error('No todo marked as done.'));
   }
@@ -39,23 +39,29 @@ router.post('/done', (req, res, next) => {
   const options = {
     uri: apiUrl(req),
     method: 'POST',
-    json: {
-      user: req.user.user_id,
-      id,
+    auth: {
+      bearer: req.user.access_token,
     },
+    json: {
+      id,
+    }
   };
 
   request.post(options, (err, response, body) => {
     if (err) {
       return next(err);
     }
-
+  
     if (response.statusCode !== 200) {
       return next(new Error(`Received response ${response.statusCode}: ${body}`));
     }
-
+  
     res.redirect('/');
   });
+
 });
+
+
+
 
 module.exports = router;
