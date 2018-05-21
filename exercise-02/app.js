@@ -54,6 +54,21 @@ passport.deserializeUser((user_id, cb) => {
   db.user(user_id, (err, user) => cb(err, user));
 });
 
+
+const Auth0Strategy = require('passport-auth0');
+
+passport.use(new Auth0Strategy({
+    domain: 'infoshare2018.eu.auth0.com',
+    clientID: 'IVDQEgKgSUPGbtZ2QKZCDFmTLHwXe61n',
+    clientSecret: 'xbXe99caMEcXcdrFRmTcnKqICOpNdNIh2S11nU75UpHUBRpOQS5Hr7JHIKqUo0ES',
+    callbackURL: 'http://localhost:3000/login/callback'
+  },
+  (accessToken, refreshToken, params, profile, cb) => {
+    db.store(profile, (err) => cb(err, profile));
+  }
+));
+
+
 // add anonymous user
 app.use(anonymousAuth);
 
